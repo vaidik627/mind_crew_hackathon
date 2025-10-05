@@ -1,0 +1,116 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Test</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>WhatsApp Number Save Test</h1>
+        <button id="testWhatsAppBtn" class="btn-save">Test WhatsApp Setup</button>
+        
+        <div id="testResults" style="margin-top: 20px; padding: 10px; background: #f0f0f0; border-radius: 5px;">
+            <h3>Test Results:</h3>
+            <div id="consoleOutput"></div>
+        </div>
+    </div>
+
+    <script src="whatsapp_service.js"></script>
+    <script>
+        // Capture console logs
+        const originalLog = console.log;
+        const originalError = console.error;
+        const outputDiv = document.getElementById('consoleOutput');
+        
+        function addToOutput(message, type = 'log') {
+            const div = document.createElement('div');
+            div.style.color = type === 'error' ? 'red' : 'blue';
+            div.textContent = `[${type.toUpperCase()}] ${message}`;
+            outputDiv.appendChild(div);
+        }
+        
+        console.log = function(...args) {
+            originalLog.apply(console, args);
+            addToOutput(args.join(' '), 'log');
+        };
+        
+        console.error = function(...args) {
+            originalError.apply(console, args);
+            addToOutput(args.join(' '), 'error');
+        };
+        
+        // Initialize WhatsApp service
+        const testWhatsappService = new WhatsAppEmergencyService();
+        
+        // Test button
+        document.getElementById('testWhatsAppBtn').addEventListener('click', () => {
+            addToOutput('Testing WhatsApp setup...', 'log');
+            testWhatsappService.showWhatsAppSetupPrompt();
+        });
+        
+        // Test localStorage
+        addToOutput('Testing localStorage...', 'log');
+        try {
+            localStorage.setItem('test', 'value');
+            localStorage.removeItem('test');
+            addToOutput('localStorage is working', 'log');
+        } catch (e) {
+            addToOutput('localStorage error: ' + e.message, 'error');
+        }
+        
+        // Function to check saved WhatsApp number
+        function checkSavedNumber() {
+            try {
+                const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                addToOutput('Current saved WhatsApp number: ' + (userProfile.whatsappNumber || 'None'), 'log');
+                return userProfile.whatsappNumber;
+            } catch (e) {
+                addToOutput('Error reading userProfile: ' + e.message, 'error');
+                return null;
+            }
+        }
+        
+        // Check initial state
+        addToOutput('Checking initial WhatsApp number...', 'log');
+        checkSavedNumber();
+        
+        // Add button to check saved number
+        const checkBtn = document.createElement('button');
+        checkBtn.textContent = 'Check Saved Number';
+        checkBtn.className = 'btn-save';
+        checkBtn.style.marginLeft = '10px';
+        checkBtn.addEventListener('click', checkSavedNumber);
+        document.getElementById('testWhatsAppBtn').parentNode.appendChild(checkBtn);
+        
+        // Add button to directly test save function
+        const directTestBtn = document.createElement('button');
+        directTestBtn.textContent = 'Direct Save Test';
+        directTestBtn.className = 'btn-save';
+        directTestBtn.style.marginLeft = '10px';
+        directTestBtn.addEventListener('click', () => {
+            addToOutput('Testing direct save with number: 9876543210', 'log');
+            try {
+                // Simulate the save process
+                const testNumber = '9876543210';
+                const phoneValidation = testWhatsappService.formatPhoneNumber(testNumber);
+                addToOutput('Phone validation result: ' + JSON.stringify(phoneValidation), 'log');
+                
+                if (phoneValidation.isValid) {
+                    const userProfile = JSON.parse(localStorage.getItem('userProfile') || '{}');
+                    userProfile.whatsappNumber = phoneValidation.formattedNumber;
+                    userProfile.lastUpdated = new Date().toISOString();
+                    localStorage.setItem('userProfile', JSON.stringify(userProfile));
+                    addToOutput('Direct save successful: ' + phoneValidation.formattedNumber, 'log');
+                } else {
+                    addToOutput('Direct save failed: ' + phoneValidation.error, 'error');
+                }
+            } catch (e) {
+                addToOutput('Direct save error: ' + e.message, 'error');
+            }
+        });
+        document.getElementById('testWhatsAppBtn').parentNode.appendChild(directTestBtn);
+    </script>
+</body>
+</html>

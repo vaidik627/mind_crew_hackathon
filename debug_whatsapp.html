@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WhatsApp Debug</title>
+</head>
+<body>
+    <h1>WhatsApp Popup Debug</h1>
+    
+    <div>
+        <h2>Current localStorage Values:</h2>
+        <div id="localStorage-values"></div>
+    </div>
+    
+    <div style="margin: 20px 0;">
+        <button onclick="clearAllStorage()">Clear All localStorage</button>
+        <button onclick="showStorageValues()">Refresh Storage Values</button>
+        <button onclick="testPopupLogic()">Test Popup Logic</button>
+    </div>
+    
+    <div>
+        <h2>Debug Log:</h2>
+        <div id="debug-log" style="background: #f0f0f0; padding: 10px; font-family: monospace; white-space: pre-wrap;"></div>
+    </div>
+
+    <script>
+        function log(message) {
+            const debugLog = document.getElementById('debug-log');
+            const timestamp = new Date().toLocaleTimeString();
+            debugLog.textContent += `[${timestamp}] ${message}\n`;
+        }
+
+        function showStorageValues() {
+            const container = document.getElementById('localStorage-values');
+            const keys = [
+                'whatsapp_number',
+                'whatsappNumber', 
+                'whatsapp_setup_skipped',
+                'whatsapp_setup_completed',
+                'newUserSetupCompleted',
+                'userName'
+            ];
+            
+            let html = '<ul>';
+            keys.forEach(key => {
+                const value = localStorage.getItem(key);
+                html += `<li><strong>${key}:</strong> ${value || 'null'}</li>`;
+            });
+            html += '</ul>';
+            container.innerHTML = html;
+            
+            log('Storage values refreshed');
+        }
+
+        function clearAllStorage() {
+            localStorage.clear();
+            showStorageValues();
+            log('All localStorage cleared');
+        }
+
+        function testPopupLogic() {
+            // Simulate the logic from the main script
+            const hasSymptoms = false; // Assuming no symptoms for new user
+            const hasWhatsAppNumber = localStorage.getItem('whatsapp_number') || localStorage.getItem('whatsappNumber');
+            const hasSkippedSetup = localStorage.getItem('whatsapp_setup_skipped');
+            const setupCompleted = localStorage.getItem('whatsapp_setup_completed');
+            const newUserSetupCompleted = localStorage.getItem('newUserSetupCompleted');
+            const hasUserName = localStorage.getItem('userName');
+            
+            const shouldNotShow = hasSymptoms || hasWhatsAppNumber || hasSkippedSetup || setupCompleted || newUserSetupCompleted;
+            
+            log(`Popup Logic Test:
+hasSymptoms: ${hasSymptoms}
+hasWhatsAppNumber: ${hasWhatsAppNumber}
+hasSkippedSetup: ${hasSkippedSetup}
+setupCompleted: ${setupCompleted}
+newUserSetupCompleted: ${newUserSetupCompleted}
+hasUserName: ${hasUserName}
+shouldNotShow: ${shouldNotShow}
+POPUP SHOULD ${shouldNotShow ? 'NOT SHOW' : 'SHOW'}`);
+        }
+
+        // Initialize on page load
+        showStorageValues();
+        log('Debug page loaded');
+    </script>
+</body>
+</html>

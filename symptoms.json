@@ -1,0 +1,31 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-01-01T00:00:00.000Z",
+    "lastModified": "2024-01-01T00:00:00.000Z",
+    "totalRecords": 0,
+    "description": "Health Tracker Symptoms Database"
+  },
+  "symptoms": [],
+  "schema": {
+    "symptom": {
+      "id": "number - unique identifier",
+      "type": "string - symptom type/category",
+      "displayName": "string - human readable name",
+      "severity": "number - 1-10 scale",
+      "duration": "string - duration description",
+      "notes": "string - additional notes",
+      "timestamp": "string - ISO date string",
+      "date": "string - formatted date",
+      "isMultiple": "boolean - part of multiple symptom entry",
+      "groupId": "number - group identifier for multiple symptoms",
+      "userId": "string - user identifier"
+    }
+  },
+  "indexes": {
+    "byDate": {},
+    "byType": {},
+    "byUser": {},
+    "byGroup": {}
+  }
+}

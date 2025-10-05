@@ -1,0 +1,391 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Database Status - HealthTracker Pro</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+        }
+        h1 {
+            color: #333;
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin: 15px 0;
+            border-left: 4px solid #28a745;
+        }
+        .status-card.error {
+            border-left-color: #dc3545;
+        }
+        .status-card.warning {
+            border-left-color: #ffc107;
+        }
+        .status-item {
+            display: flex;
+            justify-content: space-between;
+            margin: 10px 0;
+            padding: 10px;
+            background: white;
+            border-radius: 5px;
+        }
+        .status-value {
+            font-weight: bold;
+        }
+        .success { color: #28a745; }
+        .error { color: #dc3545; }
+        .warning { color: #ffc107; }
+        .info { color: #17a2b8; }
+        .test-section {
+            margin-top: 30px;
+            padding: 20px;
+            background: #e9ecef;
+            border-radius: 10px;
+        }
+        .test-button {
+            background: #007bff;
+            color: white;
+            border: none;
+            padding: 10px 20px;
+            border-radius: 5px;
+            cursor: pointer;
+            margin: 5px;
+        }
+        .test-button:hover {
+            background: #0056b3;
+        }
+        .test-results {
+            margin-top: 15px;
+            padding: 15px;
+            background: white;
+            border-radius: 5px;
+            min-height: 100px;
+            white-space: pre-wrap;
+            font-family: monospace;
+        }
+        .back-link {
+            display: inline-block;
+            margin-top: 20px;
+            color: #007bff;
+            text-decoration: none;
+            padding: 10px 20px;
+            border: 2px solid #007bff;
+            border-radius: 5px;
+            transition: all 0.3s;
+        }
+        .back-link:hover {
+            background: #007bff;
+            color: white;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>🗄️ Database Status Dashboard</h1>
+        
+        <div class="status-card" id="connectionStatus">
+            <h3>📡 Database Connection Status</h3>
+            <div class="status-item">
+                <span>Database Manager:</span>
+                <span class="status-value" id="dbManagerStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Online Status:</span>
+                <span class="status-value" id="onlineStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>Fallback Mode:</span>
+                <span class="status-value" id="fallbackStatus">Checking...</span>
+            </div>
+        </div>
+
+        <div class="status-card" id="filesStatus">
+            <h3>📁 Database Files Status</h3>
+            <div class="status-item">
+                <span>symptoms.json:</span>
+                <span class="status-value" id="symptomsFileStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>users.json:</span>
+                <span class="status-value" id="usersFileStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>symptom_definitions.json:</span>
+                <span class="status-value" id="definitionsFileStatus">Checking...</span>
+            </div>
+            <div class="status-item">
+                <span>config.json:</span>
+                <span class="status-value" id="configFileStatus">Checking...</span>
+            </div>
+        </div>
+
+        <div class="status-card" id="statsCard">
+            <h3>📊 Database Statistics</h3>
+            <div class="status-item">
+                <span>Total Symptoms:</span>
+                <span class="status-value" id="totalSymptoms">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span>Total Users:</span>
+                <span class="status-value" id="totalUsers">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span>Database Size:</span>
+                <span class="status-value" id="databaseSize">Loading...</span>
+            </div>
+            <div class="status-item">
+                <span>Last Modified:</span>
+                <span class="status-value" id="lastModified">Loading...</span>
+            </div>
+        </div>
+
+        <div class="test-section">
+            <h3>🧪 Database Tests</h3>
+            <button class="test-button" onclick="testDatabaseOperations()">Test Database Operations</button>
+            <button class="test-button" onclick="testSymptomSaveLoad()">Test Symptom Save/Load</button>
+            <button class="test-button" onclick="testFallbackMode()">Test Fallback Mode</button>
+            <button class="test-button" onclick="clearTestData()">Clear Test Data</button>
+            
+            <div class="test-results" id="testResults">
+Click a test button to run database tests...
+            </div>
+        </div>
+
+        <a href="index.html" class="back-link">← Back to HealthTracker</a>
+    </div>
+
+    <script src="database_manager.js"></script>
+    <script>
+        let testResults = document.getElementById('testResults');
+        
+        function log(message, type = 'info') {
+            const timestamp = new Date().toLocaleTimeString();
+            const prefix = type === 'error' ? '❌' : type === 'success' ? '✅' : type === 'warning' ? '⚠️' : 'ℹ️';
+            testResults.textContent += `[${timestamp}] ${prefix} ${message}\n`;
+            testResults.scrollTop = testResults.scrollHeight;
+        }
+
+        async function checkDatabaseStatus() {
+            try {
+                // Check if database manager exists
+                if (window.dbManager) {
+                    document.getElementById('dbManagerStatus').textContent = 'Connected';
+                    document.getElementById('dbManagerStatus').className = 'status-value success';
+                    
+                    // Check online status
+                    document.getElementById('onlineStatus').textContent = window.dbManager.isOnline ? 'Online' : 'Offline';
+                    document.getElementById('onlineStatus').className = `status-value ${window.dbManager.isOnline ? 'success' : 'warning'}`;
+                    
+                    // Check fallback mode
+                    document.getElementById('fallbackStatus').textContent = window.dbManager.fallbackMode ? 'Active' : 'Inactive';
+                    document.getElementById('fallbackStatus').className = `status-value ${window.dbManager.fallbackMode ? 'warning' : 'success'}`;
+                    
+                    // Get database stats
+                    const stats = await window.dbManager.getDatabaseStats();
+                    document.getElementById('totalSymptoms').textContent = stats.totalSymptoms;
+                    document.getElementById('totalUsers').textContent = stats.totalUsers;
+                    document.getElementById('databaseSize').textContent = `${(stats.databaseSize / 1024).toFixed(2)} KB`;
+                    document.getElementById('lastModified').textContent = new Date(stats.lastModified).toLocaleString();
+                    
+                } else {
+                    document.getElementById('dbManagerStatus').textContent = 'Not Available';
+                    document.getElementById('dbManagerStatus').className = 'status-value error';
+                    document.getElementById('connectionStatus').className = 'status-card error';
+                }
+                
+                // Check database files
+                await checkDatabaseFiles();
+                
+            } catch (error) {
+                console.error('Error checking database status:', error);
+                document.getElementById('dbManagerStatus').textContent = 'Error';
+                document.getElementById('dbManagerStatus').className = 'status-value error';
+            }
+        }
+
+        async function checkDatabaseFiles() {
+            const files = [
+                { name: 'symptoms.json', id: 'symptomsFileStatus' },
+                { name: 'users.json', id: 'usersFileStatus' },
+                { name: 'symptom_definitions.json', id: 'definitionsFileStatus' },
+                { name: 'config.json', id: 'configFileStatus' }
+            ];
+
+            for (const file of files) {
+                try {
+                    const response = await fetch(`./database/${file.name}`);
+                    const element = document.getElementById(file.id);
+                    if (response.ok) {
+                        element.textContent = 'Available';
+                        element.className = 'status-value success';
+                    } else {
+                        element.textContent = 'Not Found';
+                        element.className = 'status-value error';
+                    }
+                } catch (error) {
+                    const element = document.getElementById(file.id);
+                    element.textContent = 'Error';
+                    element.className = 'status-value error';
+                }
+            }
+        }
+
+        async function testDatabaseOperations() {
+            testResults.textContent = '';
+            log('Starting database operations test...', 'info');
+            
+            try {
+                if (!window.dbManager) {
+                    log('Database manager not available', 'error');
+                    return;
+                }
+                
+                // Test loading symptom definitions
+                log('Testing symptom definitions load...', 'info');
+                const definitions = await window.dbManager.loadSymptomDefinitions();
+                log(`Loaded ${definitions.categories?.length || 0} symptom categories`, 'success');
+                
+                // Test loading symptoms
+                log('Testing symptoms load...', 'info');
+                const symptoms = await window.dbManager.loadSymptoms();
+                log(`Loaded ${symptoms.length} symptoms`, 'success');
+                
+                log('Database operations test completed successfully!', 'success');
+                
+            } catch (error) {
+                log(`Database operations test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testSymptomSaveLoad() {
+            testResults.textContent = '';
+            log('Starting symptom save/load test...', 'info');
+            
+            try {
+                if (!window.dbManager) {
+                    log('Database manager not available', 'error');
+                    return;
+                }
+                
+                // Create test symptom
+                const testSymptom = {
+                    id: Date.now(),
+                    type: 'test-symptom',
+                    displayName: 'Test Symptom',
+                    severity: 3,
+                    duration: '1-2 hours',
+                    notes: 'This is a test symptom for database testing',
+                    timestamp: new Date().toISOString(),
+                    date: new Date().toLocaleDateString(),
+                    isTest: true
+                };
+                
+                log('Creating test symptom...', 'info');
+                
+                // Save test symptom
+                const saveResult = await window.dbManager.saveSymptoms([testSymptom]);
+                if (saveResult) {
+                    log('Test symptom saved successfully', 'success');
+                } else {
+                    log('Failed to save test symptom', 'error');
+                    return;
+                }
+                
+                // Load symptoms to verify
+                log('Loading symptoms to verify save...', 'info');
+                const loadedSymptoms = await window.dbManager.loadSymptoms();
+                const foundTestSymptom = loadedSymptoms.find(s => s.id === testSymptom.id);
+                
+                if (foundTestSymptom) {
+                    log('Test symptom found in loaded data', 'success');
+                    log(`Symptom details: ${foundTestSymptom.displayName} (${foundTestSymptom.severity}/5)`, 'info');
+                } else {
+                    log('Test symptom not found in loaded data', 'error');
+                }
+                
+                log('Symptom save/load test completed!', 'success');
+                
+            } catch (error) {
+                log(`Symptom save/load test failed: ${error.message}`, 'error');
+            }
+        }
+
+        async function testFallbackMode() {
+            testResults.textContent = '';
+            log('Starting fallback mode test...', 'info');
+            
+            try {
+                if (!window.dbManager) {
+                    log('Database manager not available', 'error');
+                    return;
+                }
+                
+                // Test localStorage fallback
+                log('Testing localStorage fallback...', 'info');
+                
+                const testData = { test: 'fallback data', timestamp: Date.now() };
+                const saveResult = window.dbManager.saveToLocalStorage('test', testData);
+                
+                if (saveResult) {
+                    log('Data saved to localStorage successfully', 'success');
+                } else {
+                    log('Failed to save to localStorage', 'error');
+                    return;
+                }
+                
+                const loadedData = window.dbManager.loadFromLocalStorage('test');
+                if (loadedData && loadedData.test === testData.test) {
+                    log('Data loaded from localStorage successfully', 'success');
+                    log(`Loaded data: ${JSON.stringify(loadedData)}`, 'info');
+                } else {
+                    log('Failed to load from localStorage', 'error');
+                }
+                
+                log('Fallback mode test completed!', 'success');
+                
+            } catch (error) {
+                log(`Fallback mode test failed: ${error.message}`, 'error');
+            }
+        }
+
+        function clearTestData() {
+            testResults.textContent = '';
+            log('Clearing test data...', 'info');
+            
+            try {
+                // Clear localStorage test data
+                localStorage.removeItem('healthtracker_test');
+                log('Test data cleared from localStorage', 'success');
+                
+                log('Test data cleanup completed!', 'success');
+                
+            } catch (error) {
+                log(`Failed to clear test data: ${error.message}`, 'error');
+            }
+        }
+
+        // Initialize status check when page loads
+        document.addEventListener('DOMContentLoaded', () => {
+            // Wait a bit for database manager to initialize
+            setTimeout(checkDatabaseStatus, 1000);
+        });
+    </script>
+</body>
+</html>

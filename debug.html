@@ -1,0 +1,415 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Healthcare Track Pro - Debug Console</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            margin: 0;
+            padding: 20px;
+            background: #f8fafc;
+        }
+        .debug-container {
+            max-width: 1200px;
+            margin: 0 auto;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            overflow: hidden;
+        }
+        .debug-header {
+            background: linear-gradient(135deg, #667eea, #764ba2);
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+        .debug-content {
+            padding: 20px;
+        }
+        .debug-section {
+            margin-bottom: 30px;
+            border: 1px solid #e2e8f0;
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        .section-header {
+            background: #f8fafc;
+            padding: 15px;
+            font-weight: 600;
+            border-bottom: 1px solid #e2e8f0;
+        }
+        .section-content {
+            padding: 15px;
+        }
+        .log-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 6px;
+            font-family: 'Courier New', monospace;
+            font-size: 14px;
+        }
+        .log-error {
+            background: #fee2e2;
+            color: #dc2626;
+            border-left: 4px solid #dc2626;
+        }
+        .log-warn {
+            background: #fef3c7;
+            color: #d97706;
+            border-left: 4px solid #d97706;
+        }
+        .log-info {
+            background: #dbeafe;
+            color: #2563eb;
+            border-left: 4px solid #2563eb;
+        }
+        .log-success {
+            background: #d1fae5;
+            color: #059669;
+            border-left: 4px solid #059669;
+        }
+        .test-button {
+            background: linear-gradient(135deg, #10b981, #059669);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            margin: 5px;
+            font-weight: 600;
+        }
+        .test-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(16, 185, 129, 0.3);
+        }
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .status-ok { background: #10b981; }
+        .status-error { background: #dc2626; }
+        .status-warning { background: #d97706; }
+    </style>
+</head>
+<body>
+    <div class="debug-container">
+        <div class="debug-header">
+            <h1>🔧 Healthcare Track Pro - Debug Console</h1>
+            <p>Real-time debugging and error monitoring</p>
+        </div>
+        
+        <div class="debug-content">
+            <!-- System Status -->
+            <div class="debug-section">
+                <div class="section-header">
+                    <span class="status-indicator" id="systemStatus"></span>
+                    System Status
+                </div>
+                <div class="section-content" id="systemStatusContent">
+                    <div>Loading system status...</div>
+                </div>
+            </div>
+
+            <!-- JavaScript Errors -->
+            <div class="debug-section">
+                <div class="section-header">
+                    <span class="status-indicator" id="errorStatus"></span>
+                    JavaScript Errors & Warnings
+                </div>
+                <div class="section-content" id="errorLog">
+                    <div class="log-info">No errors detected yet...</div>
+                </div>
+            </div>
+
+            <!-- WhatsApp Service Status -->
+            <div class="debug-section">
+                <div class="section-header">
+                    <span class="status-indicator" id="whatsappStatus"></span>
+                    WhatsApp Service Status
+                </div>
+                <div class="section-content" id="whatsappStatusContent">
+                    <button class="test-button" onclick="testWhatsAppService()">Test WhatsApp Service</button>
+                    <button class="test-button" onclick="testEmergencyAlert()">Test Emergency Alert</button>
+                    <div id="whatsappTestResults"></div>
+                </div>
+            </div>
+
+            <!-- Database Status -->
+            <div class="debug-section">
+                <div class="section-header">
+                    <span class="status-indicator" id="dbStatus"></span>
+                    Database & Storage Status
+                </div>
+                <div class="section-content" id="dbStatusContent">
+                    <button class="test-button" onclick="testDatabase()">Test Database</button>
+                    <button class="test-button" onclick="testLocalStorage()">Test LocalStorage</button>
+                    <div id="dbTestResults"></div>
+                </div>
+            </div>
+
+            <!-- Console Logs -->
+            <div class="debug-section">
+                <div class="section-header">
+                    <span class="status-indicator status-ok"></span>
+                    Live Console Logs
+                </div>
+                <div class="section-content" id="consoleLog">
+                    <div class="log-info">Console monitoring active...</div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Include the main application scripts -->
+    <script src="database_manager.js"></script>
+    <script src="ai_suggestion_engine.js"></script>
+    <script src="whatsapp_service.js"></script>
+
+    <script>
+        // Debug utility functions
+        class DebugConsole {
+            constructor() {
+                this.errorCount = 0;
+                this.warningCount = 0;
+                this.setupErrorHandling();
+                this.checkSystemStatus();
+            }
+
+            setupErrorHandling() {
+                // Capture JavaScript errors
+                window.addEventListener('error', (event) => {
+                    this.logError('JavaScript Error', event.error?.message || event.message, event.filename, event.lineno);
+                });
+
+                // Capture unhandled promise rejections
+                window.addEventListener('unhandledrejection', (event) => {
+                    this.logError('Unhandled Promise Rejection', event.reason);
+                });
+
+                // Override console methods to capture logs
+                const originalConsole = {
+                    log: console.log,
+                    error: console.error,
+                    warn: console.warn,
+                    info: console.info
+                };
+
+                console.error = (...args) => {
+                    originalConsole.error(...args);
+                    this.logError('Console Error', args.join(' '));
+                };
+
+                console.warn = (...args) => {
+                    originalConsole.warn(...args);
+                    this.logWarning('Console Warning', args.join(' '));
+                };
+
+                console.log = (...args) => {
+                    originalConsole.log(...args);
+                    this.logInfo('Console Log', args.join(' '));
+                };
+            }
+
+            logError(type, message, file = '', line = '') {
+                this.errorCount++;
+                const errorLog = document.getElementById('errorLog');
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item log-error';
+                logItem.innerHTML = `
+                    <strong>${type}:</strong> ${message}
+                    ${file ? `<br><small>File: ${file}:${line}</small>` : ''}
+                    <br><small>Time: ${new Date().toLocaleTimeString()}</small>
+                `;
+                errorLog.appendChild(logItem);
+                
+                // Update error status
+                document.getElementById('errorStatus').className = 'status-indicator status-error';
+                this.updateSystemStatus();
+            }
+
+            logWarning(type, message) {
+                this.warningCount++;
+                const errorLog = document.getElementById('errorLog');
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item log-warn';
+                logItem.innerHTML = `
+                    <strong>${type}:</strong> ${message}
+                    <br><small>Time: ${new Date().toLocaleTimeString()}</small>
+                `;
+                errorLog.appendChild(logItem);
+                
+                if (this.errorCount === 0) {
+                    document.getElementById('errorStatus').className = 'status-indicator status-warning';
+                }
+                this.updateSystemStatus();
+            }
+
+            logInfo(type, message) {
+                const consoleLog = document.getElementById('consoleLog');
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item log-info';
+                logItem.innerHTML = `
+                    <strong>${type}:</strong> ${message}
+                    <br><small>Time: ${new Date().toLocaleTimeString()}</small>
+                `;
+                consoleLog.appendChild(logItem);
+                
+                // Keep only last 10 console logs
+                const logs = consoleLog.querySelectorAll('.log-item');
+                if (logs.length > 10) {
+                    logs[0].remove();
+                }
+            }
+
+            logSuccess(type, message) {
+                const logItem = document.createElement('div');
+                logItem.className = 'log-item log-success';
+                logItem.innerHTML = `
+                    <strong>${type}:</strong> ${message}
+                    <br><small>Time: ${new Date().toLocaleTimeString()}</small>
+                `;
+                return logItem;
+            }
+
+            checkSystemStatus() {
+                const statusContent = document.getElementById('systemStatusContent');
+                let status = [];
+
+                // Check if main scripts are loaded
+                status.push(`Database Manager: ${typeof dbManager !== 'undefined' ? '✅ Loaded' : '❌ Not Loaded'}`);
+                status.push(`AI Suggestion Engine: ${typeof aiSuggestionEngine !== 'undefined' ? '✅ Loaded' : '❌ Not Loaded'}`);
+                status.push(`WhatsApp Service: ${typeof whatsappService !== 'undefined' ? '✅ Loaded' : '❌ Not Loaded'}`);
+                
+                // Check localStorage
+                try {
+                    localStorage.setItem('test', 'test');
+                    localStorage.removeItem('test');
+                    status.push('LocalStorage: ✅ Available');
+                } catch (e) {
+                    status.push('LocalStorage: ❌ Not Available');
+                }
+
+                statusContent.innerHTML = status.map(s => `<div>${s}</div>`).join('');
+                this.updateSystemStatus();
+            }
+
+            updateSystemStatus() {
+                const systemStatus = document.getElementById('systemStatus');
+                if (this.errorCount > 0) {
+                    systemStatus.className = 'status-indicator status-error';
+                } else if (this.warningCount > 0) {
+                    systemStatus.className = 'status-indicator status-warning';
+                } else {
+                    systemStatus.className = 'status-indicator status-ok';
+                }
+            }
+        }
+
+        // Test functions
+        function testWhatsAppService() {
+            const resultsDiv = document.getElementById('whatsappTestResults');
+            resultsDiv.innerHTML = '';
+
+            try {
+                if (typeof whatsappService === 'undefined') {
+                    throw new Error('WhatsApp service not loaded');
+                }
+
+                // Test phone number formatting
+                const testNumbers = ['9876543210', '+91 9876543210', '+1 2345678901', '123'];
+                testNumbers.forEach(number => {
+                    const result = whatsappService.formatPhoneNumber(number);
+                    const logItem = debugConsole.logSuccess('Phone Format Test', 
+                        `Input: ${number} → Output: ${result.isValid ? result.formattedNumber : result.error}`);
+                    resultsDiv.appendChild(logItem);
+                });
+
+                document.getElementById('whatsappStatus').className = 'status-indicator status-ok';
+            } catch (error) {
+                const logItem = debugConsole.logError('WhatsApp Test Failed', error.message);
+                resultsDiv.appendChild(logItem);
+                document.getElementById('whatsappStatus').className = 'status-indicator status-error';
+            }
+        }
+
+        function testEmergencyAlert() {
+            const resultsDiv = document.getElementById('whatsappTestResults');
+            
+            try {
+                if (typeof whatsappService === 'undefined') {
+                    throw new Error('WhatsApp service not loaded');
+                }
+
+                const testSymptoms = [
+                    { type: 'chest-pain', severity: 9, name: 'Chest Pain' },
+                    { type: 'headache', severity: 5, name: 'Headache' }
+                ];
+
+                const isEmergency = whatsappService.isEmergencyAlert(testSymptoms);
+                const logItem = debugConsole.logSuccess('Emergency Alert Test', 
+                    `Emergency detected: ${isEmergency ? 'Yes' : 'No'}`);
+                resultsDiv.appendChild(logItem);
+
+            } catch (error) {
+                const logItem = debugConsole.logError('Emergency Alert Test Failed', error.message);
+                resultsDiv.appendChild(logItem);
+            }
+        }
+
+        function testDatabase() {
+            const resultsDiv = document.getElementById('dbTestResults');
+            resultsDiv.innerHTML = '';
+
+            try {
+                if (typeof dbManager === 'undefined') {
+                    throw new Error('Database manager not loaded');
+                }
+
+                const logItem = debugConsole.logSuccess('Database Test', 'Database manager is available');
+                resultsDiv.appendChild(logItem);
+                document.getElementById('dbStatus').className = 'status-indicator status-ok';
+
+            } catch (error) {
+                const logItem = debugConsole.logError('Database Test Failed', error.message);
+                resultsDiv.appendChild(logItem);
+                document.getElementById('dbStatus').className = 'status-indicator status-error';
+            }
+        }
+
+        function testLocalStorage() {
+            const resultsDiv = document.getElementById('dbTestResults');
+            
+            try {
+                // Test localStorage operations
+                const testData = { test: 'data', timestamp: Date.now() };
+                localStorage.setItem('debugTest', JSON.stringify(testData));
+                const retrieved = JSON.parse(localStorage.getItem('debugTest'));
+                localStorage.removeItem('debugTest');
+
+                if (retrieved.test === 'data') {
+                    const logItem = debugConsole.logSuccess('LocalStorage Test', 'Read/Write operations successful');
+                    resultsDiv.appendChild(logItem);
+                } else {
+                    throw new Error('Data integrity check failed');
+                }
+
+            } catch (error) {
+                const logItem = debugConsole.logError('LocalStorage Test Failed', error.message);
+                resultsDiv.appendChild(logItem);
+            }
+        }
+
+        // Initialize debug console
+        const debugConsole = new DebugConsole();
+
+        // Log initial status
+        console.log('Debug console initialized');
+        console.info('Monitoring for errors and warnings...');
+    </script>
+</body>
+</html>

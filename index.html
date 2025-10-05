@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>HealthTracker Pro - Intelligent Symptom Logger</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <!-- Authentication Check -->
+    <script>
+        // Check authentication before loading the page
+        (function() {
+            const sessionKey = 'healthtracker_session';
+            const localSession = localStorage.getItem(sessionKey);
+            const sessionSession = sessionStorage.getItem(sessionKey);
+            
+            // If no session exists, redirect to login
+            if (!localSession && !sessionSession) {
+                window.location.href = 'login.html';
+                return;
+            }
+            
+            // Optional: Add logout functionality
+            window.logout = function() {
+                localStorage.removeItem(sessionKey);
+                sessionStorage.removeItem(sessionKey);
+                window.location.href = 'login.html';
+            };
+        })();
+    </script>
+</head>
+<body>
+    <div class="container">
+        <!-- Header -->
+        <header class="header">
+            <div class="logo">
+                <i class="fas fa-heartbeat"></i>
+                <h1>HealthTracker Pro</h1>
+            </div>
+
+            <div class="user-actions">
+                <button class="logout-btn" onclick="openSettingsModal()" title="Settings">
+                    <i class="fas fa-cog"></i>
+                </button>
+                <button class="logout-btn" onclick="toggleTheme()" title="Toggle theme">
+                    <i class="fas fa-moon"></i>
+                </button>
+                <button class="logout-btn" onclick="logout()" title="Logout">
+                    <i class="fas fa-sign-out-alt"></i>
+                </button>
+            </div>
+        </header>
+
+        <!-- Navigation -->
+        <nav class="nav-tabs">
+            <button class="tab-btn active" data-tab="log">
+                <i class="fas fa-plus-circle"></i> Log Symptoms
+            </button>
+            <button class="tab-btn" data-tab="history">
+                <i class="fas fa-history"></i> History
+            </button>
+            <button class="tab-btn" data-tab="insights">
+                <i class="fas fa-chart-line"></i> Insights
+            </button>
+            <button class="tab-btn" data-tab="suggestions">
+                <i class="fas fa-lightbulb"></i> Suggestions
+            </button>
+        </nav>
+
+        <!-- Main Content -->
+        <main class="main-content">
+            <!-- Symptom Logging Tab -->
+            <div class="tab-content active" id="log">
+                <div class="card">
+                    <h2><i class="fas fa-clipboard-list"></i> Log Your Symptoms</h2>
+                    <form id="symptomForm" class="symptom-form">
+                        <div class="form-group">
+                            <label for="symptomInput">Describe Your Symptoms:</label>
+                            <div class="symptom-input-container">
+                                <div class="input-wrapper">
+                                    <input type="text" id="symptomInput" placeholder="Type symptoms or search suggestions..." autocomplete="off">
+                                    <i class="fas fa-search search-icon" aria-hidden="true"></i>
+                                    <button type="button" id="addSymptomBtn" class="add-symptom-btn" title="Add symptom">
+                                        <i class="fas fa-plus"></i>
+                                    </button>
+                                </div>
+                                <div class="symptom-suggestions" id="symptomSuggestions">
+                                    <!-- Suggestions will be populated by JavaScript -->
+                                </div>
+                            </div>
+                            
+                            <!-- Selected Symptoms Display -->
+                            <div class="selected-symptoms" id="selectedSymptoms">
+                                <div class="selected-symptoms-header">
+                                    <i class="fas fa-check-circle"></i>
+                                    <span>Selected Symptoms:</span>
+                                </div>
+                                <div class="selected-symptoms-list" id="selectedSymptomsList">
+                                    <!-- Selected symptoms will be displayed here -->
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label>Quick Symptom Categories:</label>
+                            <div class="symptom-categories">
+                                <div class="category-group" data-category="pain">
+                                    <div class="category-header">
+                                        <i class="fas fa-exclamation-triangle"></i>
+                                        <span>Pain & Discomfort</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="headache">Headache</button>
+                                        <button type="button" class="symptom-tag" data-symptom="chest-pain">Chest Pain</button>
+                                        <button type="button" class="symptom-tag" data-symptom="stomach-pain">Stomach Pain</button>
+                                        <button type="button" class="symptom-tag" data-symptom="joint-pain">Joint Pain</button>
+                                        <button type="button" class="symptom-tag" data-symptom="back-pain">Back Pain</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="category-group" data-category="respiratory">
+                                    <div class="category-header">
+                                        <i class="fas fa-lungs"></i>
+                                        <span>Respiratory</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="cough">Cough</button>
+                                        <button type="button" class="symptom-tag" data-symptom="shortness-of-breath">Shortness of Breath</button>
+                                        <button type="button" class="symptom-tag" data-symptom="sore-throat">Sore Throat</button>
+                                        <button type="button" class="symptom-tag" data-symptom="runny-nose">Runny Nose</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="category-group" data-category="general">
+                                    <div class="category-header">
+                                        <i class="fas fa-thermometer-half"></i>
+                                        <span>General Symptoms</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="fever">Fever</button>
+                                        <button type="button" class="symptom-tag" data-symptom="fatigue">Fatigue</button>
+                                        <button type="button" class="symptom-tag" data-symptom="nausea">Nausea</button>
+                                        <button type="button" class="symptom-tag" data-symptom="dizziness">Dizziness</button>
+                                        <button type="button" class="symptom-tag" data-symptom="chills">Chills</button>
+                                    </div>
+                                </div>
+                                
+                                <div class="category-group" data-category="mental">
+                                    <div class="category-header">
+                                        <i class="fas fa-brain"></i>
+                                        <span>Mental Health</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="anxiety">Anxiety</button>
+                                        <button type="button" class="symptom-tag" data-symptom="depression">Depression</button>
+                                        <button type="button" class="symptom-tag" data-symptom="insomnia">Insomnia</button>
+                                        <button type="button" class="symptom-tag" data-symptom="stress">Stress</button>
+                                    </div>
+                                </div>
+
+                                <div class="category-group" data-category="digestive">
+                                    <div class="category-header">
+                                        <i class="fas fa-utensils"></i>
+                                        <span>Digestive</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="heartburn">Heartburn</button>
+                                        <button type="button" class="symptom-tag" data-symptom="bloating">Bloating</button>
+                                        <button type="button" class="symptom-tag" data-symptom="constipation">Constipation</button>
+                                        <button type="button" class="symptom-tag" data-symptom="diarrhea">Diarrhea</button>
+                                    </div>
+                                </div>
+
+                                <div class="category-group" data-category="skin">
+                                    <div class="category-header">
+                                        <i class="fas fa-hand-paper"></i>
+                                        <span>Skin & External</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="rash">Rash</button>
+                                        <button type="button" class="symptom-tag" data-symptom="itching">Itching</button>
+                                        <button type="button" class="symptom-tag" data-symptom="swelling">Swelling</button>
+                                        <button type="button" class="symptom-tag" data-symptom="bruising">Bruising</button>
+                                    </div>
+                                </div>
+
+                                <div class="category-group" data-category="neurological">
+                                    <div class="category-header">
+                                        <i class="fas fa-head-side-virus"></i>
+                                        <span>Neurological</span>
+                                    </div>
+                                    <div class="category-items">
+                                        <button type="button" class="symptom-tag" data-symptom="migraine">Migraine</button>
+                                        <button type="button" class="symptom-tag" data-symptom="numbness">Numbness</button>
+                                        <button type="button" class="symptom-tag" data-symptom="tingling">Tingling</button>
+                                        <button type="button" class="symptom-tag" data-symptom="confusion">Confusion</button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="severity">Severity Level:</label>
+                            <div class="severity-slider">
+                                <input type="range" id="severity" min="1" max="10" value="5">
+                                <div class="severity-labels">
+                                    <span>Mild (1)</span>
+                                    <span id="severityValue">5</span>
+                                    <span>Severe (10)</span>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="duration">Duration:</label>
+                            <select id="duration" required>
+                                <option value="">Select duration</option>
+                                <option value="less-than-hour">Less than 1 hour</option>
+                                <option value="1-3-hours">1-3 hours</option>
+                                <option value="6-24-hours">6-24 hours</option>
+                                <option value="1-3-days">1-3 days</option>
+                                <option value="more-than-3-days">More than 3 days</option>
+                            </select>
+                        </div>
+
+                        <div class="form-group">
+                            <label for="notes">Additional Notes:</label>
+                            <textarea id="notes" placeholder="Any additional details about your symptom..."></textarea>
+                        </div>
+
+                        <button type="submit" class="btn-primary">
+                            <i class="fas fa-save"></i> Log Symptom
+                        </button>
+                    </form>
+                </div>
+
+                <!-- Emergency Alert -->
+                <div class="emergency-alert" id="emergencyAlert" style="display: none;">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <div>
+                        <h3>Emergency Alert</h3>
+                        <p>Your symptoms may require immediate medical attention. Please consider contacting a healthcare provider.</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- History Tab -->
+            <div class="tab-content" id="history">
+                <div class="card">
+                    <h2><i class="fas fa-history"></i> Symptom History</h2>
+                    <div class="history-filters">
+                        <select id="historyFilter">
+                            <option value="all">All Symptoms</option>
+                            <option value="today">Today</option>
+                            <option value="week">This Week</option>
+                            <option value="month">This Month</option>
+                        </select>
+                    </div>
+                    <div class="timeline" id="symptomTimeline">
+                        <!-- Timeline items will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- Insights Tab -->
+            <div class="tab-content" id="insights">
+                <div class="card">
+                    <h2><i class="fas fa-chart-line"></i> Health Insights</h2>
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <h3>Symptom Frequency</h3>
+                            <canvas id="frequencyChart"></canvas>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Severity Trends</h3>
+                            <canvas id="severityChart"></canvas>
+                        </div>
+                        <div class="insight-card">
+                            <h3>Pattern Analysis</h3>
+                            <div id="patternAnalysis">
+                                <!-- Pattern insights will be populated by JavaScript -->
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Suggestions Tab -->
+            <div class="tab-content" id="suggestions">
+                <div class="card">
+                    <h2><i class="fas fa-lightbulb"></i> Personalized Suggestions</h2>
+                    <div class="suggestions-container" id="suggestionsContainer">
+                        <!-- Suggestions will be populated by JavaScript -->
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Settings Modal -->
+    <div id="settingsModal" class="modal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h2><i class="fas fa-cog"></i> Settings</h2>
+                <span class="close" onclick="closeSettingsModal()">&times;</span>
+            </div>
+            <div class="modal-body">
+                <div class="settings-section">
+                    <h3><i class="fas fa-user"></i> User Profile</h3>
+                    <p>Configure your personal information</p>
+                    
+                    <div class="form-group">
+                        <label for="userNameInput">Your Name:</label>
+                        <input type="text" id="userNameInput" placeholder="Enter your name" />
+                    </div>
+                    
+                    <button class="btn-primary" onclick="saveSettings()">
+                        <i class="fas fa-save"></i> Save Settings
+                    </button>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fab fa-whatsapp"></i> WhatsApp Emergency Alerts</h3>
+                    <p>Configure WhatsApp number for emergency notifications (severity 8+)</p>
+                    
+                    <div class="form-group">
+                        <label for="whatsappNumberInput">WhatsApp Number:</label>
+                        <input type="tel" id="whatsappNumberInput" placeholder="Enter phone number (e.g., 9876543210)" />
+                        <small style="color: #666; font-size: 12px; margin-top: 5px; display: block;">
+                            Emergency alerts will be sent to this number for high-severity symptoms
+                        </small>
+                    </div>
+                    
+                    <div style="display: flex; gap: 10px; margin-top: 15px;">
+                        <button class="btn-primary" onclick="saveWhatsAppSettings()" style="flex: 1;">
+                            <i class="fas fa-save"></i> Save WhatsApp Number
+                        </button>
+                        <button class="btn-secondary" onclick="testWhatsAppAlert()" style="flex: 1;">
+                            <i class="fas fa-paper-plane"></i> Test Alert
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="settings-section">
+                    <h3><i class="fas fa-info-circle"></i> Emergency Conditions</h3>
+                    <p>Alerts will be sent for these conditions:</p>
+                    <ul class="emergency-conditions-list">
+                        <li>Chest pain (any severity)</li>
+                        <li>Difficulty breathing (any severity)</li>
+                        <li>Severe headache (severity 8+)</li>
+                        <li>High fever (severity 8+)</li>
+                        <li>Severe abdominal pain (severity 8+)</li>
+                        <li>Any symptom with severity 9 or 10</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script src="database_manager.js"></script>
+    <script src="ai_suggestion_engine.js"></script>
+    <script src="whatsapp_service.js"></script>
+    <script src="script.js"></script>
+</body>
+</html>

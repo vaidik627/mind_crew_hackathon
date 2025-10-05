@@ -1,0 +1,159 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "lastUpdated": "2024-01-01",
+    "description": "Comprehensive health knowledge database for AI-powered suggestions"
+  },
+  "symptoms": {
+    "headache": {
+      "description": "Pain or discomfort in the head or neck area",
+      "commonCauses": ["stress", "dehydration", "lack of sleep", "eye strain", "tension", "migraine"],
+      "severity": {
+        "mild": "1-3",
+        "moderate": "4-6", 
+        "severe": "7-10"
+      },
+      "treatments": {
+        "immediate": ["rest in dark room", "hydration", "cold/warm compress", "gentle massage"],
+        "medications": ["acetaminophen", "ibuprofen", "aspirin"],
+        "prevention": ["regular sleep", "stress management", "hydration", "limit screen time"]
+      },
+      "redFlags": ["sudden severe headache", "headache with fever", "vision changes", "neck stiffness"],
+      "relatedSymptoms": ["nausea", "dizziness", "fatigue", "sensitivity to light"]
+    },
+    "fever": {
+      "description": "Elevated body temperature above normal range (>100.4°F/38°C)",
+      "commonCauses": ["viral infection", "bacterial infection", "inflammation", "heat exhaustion"],
+      "severity": {
+        "low": "100.4-101°F",
+        "moderate": "101-103°F",
+        "high": ">103°F"
+      },
+      "treatments": {
+        "immediate": ["rest", "hydration", "cool environment", "light clothing"],
+        "medications": ["acetaminophen", "ibuprofen"],
+        "prevention": ["good hygiene", "vaccination", "avoid sick contacts"]
+      },
+      "redFlags": ["fever >103°F", "difficulty breathing", "severe headache", "rash"],
+      "relatedSymptoms": ["chills", "sweating", "fatigue", "muscle aches"]
+    },
+    "cough": {
+      "description": "Sudden expulsion of air from lungs to clear airways",
+      "commonCauses": ["viral infection", "allergies", "asthma", "acid reflux", "smoking"],
+      "severity": {
+        "mild": "occasional, dry",
+        "moderate": "frequent, productive",
+        "severe": "persistent, blood"
+      },
+      "treatments": {
+        "immediate": ["honey", "warm liquids", "humidifier", "throat lozenges"],
+        "medications": ["dextromethorphan", "guaifenesin", "antihistamines"],
+        "prevention": ["avoid irritants", "good hygiene", "stay hydrated"]
+      },
+      "redFlags": ["blood in cough", "difficulty breathing", "chest pain", "persistent >3 weeks"],
+      "relatedSymptoms": ["sore throat", "runny nose", "fever", "chest congestion"]
+    },
+    "fatigue": {
+      "description": "Persistent tiredness or lack of energy",
+      "commonCauses": ["poor sleep", "stress", "dehydration", "poor nutrition", "medical conditions"],
+      "severity": {
+        "mild": "slightly tired",
+        "moderate": "affects daily activities",
+        "severe": "unable to function normally"
+      },
+      "treatments": {
+        "immediate": ["rest", "hydration", "light exercise", "balanced nutrition"],
+        "medications": ["multivitamins", "iron supplements (if deficient)"],
+        "prevention": ["regular sleep schedule", "stress management", "exercise", "healthy diet"]
+      },
+      "redFlags": ["sudden severe fatigue", "with chest pain", "unexplained weight loss"],
+      "relatedSymptoms": ["weakness", "difficulty concentrating", "mood changes"]
+    },
+    "nausea": {
+      "description": "Feeling of sickness with urge to vomit",
+      "commonCauses": ["food poisoning", "motion sickness", "pregnancy", "medications", "stress"],
+      "severity": {
+        "mild": "slight queasiness",
+        "moderate": "strong urge to vomit",
+        "severe": "persistent vomiting"
+      },
+      "treatments": {
+        "immediate": ["ginger", "small sips of clear fluids", "bland foods", "fresh air"],
+        "medications": ["ondansetron", "meclizine", "dimenhydrinate"],
+        "prevention": ["avoid triggers", "eat small meals", "stay hydrated"]
+      },
+      "redFlags": ["severe dehydration", "blood in vomit", "severe abdominal pain"],
+      "relatedSymptoms": ["vomiting", "dizziness", "stomach pain", "loss of appetite"]
+    }
+  },
+  "medications": {
+    "acetaminophen": {
+      "genericName": "acetaminophen",
+      "brandNames": ["Tylenol", "Panadol"],
+      "uses": ["pain relief", "fever reduction"],
+      "dosage": "500-1000mg every 4-6 hours (max 4000mg/day)",
+      "sideEffects": ["rare at normal doses", "liver damage with overdose"],
+      "contraindications": ["liver disease", "alcohol abuse"]
+    },
+    "ibuprofen": {
+      "genericName": "ibuprofen",
+      "brandNames": ["Advil", "Motrin"],
+      "uses": ["pain relief", "fever reduction", "inflammation"],
+      "dosage": "200-400mg every 4-6 hours (max 1200mg/day)",
+      "sideEffects": ["stomach upset", "kidney problems", "increased bleeding risk"],
+      "contraindications": ["kidney disease", "heart problems", "stomach ulcers"]
+    }
+  },
+  "reasoningRules": {
+    "emergencySymptoms": {
+      "rule": "IF severity >= 8 OR symptom IN ['chest-pain', 'shortness-breath', 'severe-headache'] THEN recommend immediate medical attention",
+      "reasoning": "High severity symptoms or potentially life-threatening conditions require immediate professional evaluation"
+    },
+    "symptomCombinations": {
+      "fever_headache": {
+        "rule": "IF fever AND headache THEN consider infection",
+        "reasoning": "Combination of fever and headache often indicates viral or bacterial infection requiring monitoring"
+      },
+      "cough_fever": {
+        "rule": "IF cough AND fever THEN consider respiratory infection",
+        "reasoning": "Respiratory symptoms with fever suggest possible pneumonia or bronchitis"
+      },
+      "nausea_headache": {
+        "rule": "IF nausea AND headache THEN consider migraine or increased intracranial pressure",
+        "reasoning": "This combination is common in migraines but can also indicate more serious conditions"
+      }
+    },
+    "frequencyPatterns": {
+      "recurring_headaches": {
+        "rule": "IF headache frequency > 3 per week THEN recommend trigger identification",
+        "reasoning": "Frequent headaches suggest underlying triggers that need identification and management"
+      },
+      "persistent_fatigue": {
+        "rule": "IF fatigue duration > 2 weeks THEN recommend medical evaluation",
+        "reasoning": "Chronic fatigue may indicate underlying medical conditions requiring professional assessment"
+      }
+    }
+  },
+  "treatmentProtocols": {
+    "mild_headache": {
+      "steps": [
+        "Rest in quiet, dark room",
+        "Apply cold or warm compress",
+        "Stay hydrated",
+        "Consider OTC pain reliever if needed"
+      ],
+      "timeframe": "30-60 minutes",
+      "escalation": "If no improvement in 2 hours, consider stronger medication"
+    },
+    "low_fever": {
+      "steps": [
+        "Monitor temperature regularly",
+        "Increase fluid intake",
+        "Rest and avoid strenuous activity",
+        "Consider fever reducer if uncomfortable"
+      ],
+      "timeframe": "24-48 hours",
+      "escalation": "If fever >101°F or persists >3 days, seek medical care"
+    }
+  }
+}

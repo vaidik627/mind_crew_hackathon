@@ -1,0 +1,184 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Symptom Input</title>
+    <style>
+        body { font-family: Arial, sans-serif; padding: 20px; }
+        .test-container { max-width: 600px; margin: 0 auto; }
+        .input-container { margin: 20px 0; }
+        input { padding: 10px; width: 300px; border: 1px solid #ccc; }
+        .selected-symptoms { margin: 20px 0; padding: 10px; border: 1px solid #ddd; min-height: 50px; }
+        .symptom-item { display: inline-block; background: #e7f3ff; padding: 5px 10px; margin: 5px; border-radius: 15px; }
+        .debug-log { background: #f5f5f5; padding: 10px; margin: 10px 0; font-family: monospace; white-space: pre-wrap; }
+    </style>
+</head>
+<body>
+    <div class="test-container">
+        <h1>Test Manual Symptom Input</h1>
+        
+        <div class="input-container">
+            <label for="symptomInput">Type a symptom and press Enter:</label><br>
+            <input type="text" id="symptomInput" placeholder="Type symptoms like 'headache', 'fever', etc." autocomplete="off">
+        </div>
+        
+        <div class="selected-symptoms" id="selectedSymptoms">
+            <strong>Selected Symptoms:</strong>
+            <div id="selectedSymptomsList"></div>
+        </div>
+        
+        <div class="debug-log" id="debugLog">Debug log will appear here...</div>
+        
+        <button onclick="clearSymptoms()">Clear All</button>
+        <button onclick="testKnownSymptom()">Test "headache"</button>
+        <button onclick="testCustomSymptom()">Test "custom pain"</button>
+    </div>
+
+    <script>
+        // Simple test implementation
+        class TestSymptomTracker {
+            constructor() {
+                this.selectedSymptoms = [];
+                this.symptomDatabase = [
+                    { name: 'Headache', category: 'pain', keywords: ['head', 'migraine', 'tension'] },
+                    { name: 'Fever', category: 'general', keywords: ['fever', 'temperature', 'hot'] },
+                    { name: 'Cough', category: 'respiratory', keywords: ['cough', 'dry cough', 'wet cough'] },
+                    { name: 'Fatigue', category: 'general', keywords: ['tired', 'exhausted', 'fatigue', 'weakness'] },
+                    { name: 'Nausea', category: 'general', keywords: ['nausea', 'sick', 'queasy'] }
+                ];
+                this.setupInput();
+            }
+            
+            setupInput() {
+                const input = document.getElementById('symptomInput');
+                input.addEventListener('keydown', (e) => {
+                    if (e.key === 'Enter') {
+                        e.preventDefault();
+                        const inputValue = e.target.value.trim();
+                        this.log(`Enter pressed with value: "${inputValue}"`);
+                        if (inputValue) {
+                            this.addSymptomDirectly(inputValue);
+                            e.target.value = '';
+                        }
+                    }
+                });
+            }
+            
+            addSymptomDirectly(input) {
+                this.log(`addSymptomDirectly called with: "${input}"`);
+                
+                const symptoms = input.split(/[,;]+/).map(s => s.trim()).filter(s => s.length > 0);
+                this.log(`Processed symptoms: ${JSON.stringify(symptoms)}`);
+                
+                symptoms.forEach(symptomText => {
+                    const matchedSymptom = this.findBestSymptomMatch(symptomText.toLowerCase());
+                    this.log(`Matched symptom for "${symptomText}": ${matchedSymptom ? matchedSymptom.name : 'none'}`);
+                    
+                    if (matchedSymptom) {
+                        const symptomName = matchedSymptom.name;
+                        if (!this.selectedSymptoms.some(s => s.toLowerCase() === symptomName.toLowerCase())) {
+                            this.selectedSymptoms.push(symptomName);
+                            this.log(`Added matched symptom: ${symptomName}`);
+                        } else {
+                            this.log(`Symptom already selected: ${symptomName}`);
+                        }
+                    } else {
+                        if (this.isValidSymptomInput(symptomText)) {
+                            const formattedSymptom = this.formatSymptomName(symptomText);
+                            if (!this.selectedSymptoms.some(s => s.toLowerCase() === formattedSymptom.toLowerCase())) {
+                                this.selectedSymptoms.push(formattedSymptom);
+                                this.log(`Added custom symptom: ${formattedSymptom}`);
+                            }
+                        } else {
+                            this.log(`Invalid symptom input: ${symptomText}`);
+                        }
+                    }
+                });
+                
+                this.updateDisplay();
+            }
+            
+            findBestSymptomMatch(input) {
+                const query = input.toLowerCase();
+                
+                // First try exact name match
+                let match = this.symptomDatabase.find(symptom => 
+                    symptom.name.toLowerCase() === query
+                );
+                
+                if (match) return match;
+                
+                // Then try partial name match
+                match = this.symptomDatabase.find(symptom => 
+                    symptom.name.toLowerCase().includes(query) || query.includes(symptom.name.toLowerCase())
+                );
+                
+                if (match) return match;
+                
+                // Finally try keyword match
+                match = this.symptomDatabase.find(symptom => 
+                    symptom.keywords.some(keyword => 
+                        keyword.includes(query) || query.includes(keyword)
+                    )
+                );
+                
+                return match;
+            }
+            
+            isValidSymptomInput(input) {
+                const minLength = 2;
+                const maxLength = 50;
+                const validPattern = /^[a-zA-Z\s\-']+$/;
+                
+                return input.length >= minLength && 
+                       input.length <= maxLength && 
+                       validPattern.test(input);
+            }
+            
+            formatSymptomName(symptom) {
+                if (typeof symptom === 'object' && symptom.name) {
+                    return symptom.name;
+                }
+                
+                return symptom.split('-').map(word => 
+                    word.charAt(0).toUpperCase() + word.slice(1)
+                ).join(' ');
+            }
+            
+            updateDisplay() {
+                const container = document.getElementById('selectedSymptomsList');
+                container.innerHTML = this.selectedSymptoms.map(symptom => 
+                    `<div class="symptom-item">${symptom}</div>`
+                ).join('');
+                this.log(`Updated display with ${this.selectedSymptoms.length} symptoms`);
+            }
+            
+            log(message) {
+                const debugLog = document.getElementById('debugLog');
+                const timestamp = new Date().toLocaleTimeString();
+                debugLog.textContent += `[${timestamp}] ${message}\n`;
+                debugLog.scrollTop = debugLog.scrollHeight;
+            }
+        }
+        
+        // Initialize test tracker
+        const tracker = new TestSymptomTracker();
+        
+        // Test functions
+        function clearSymptoms() {
+            tracker.selectedSymptoms = [];
+            tracker.updateDisplay();
+            tracker.log('Cleared all symptoms');
+        }
+        
+        function testKnownSymptom() {
+            tracker.addSymptomDirectly('headache');
+        }
+        
+        function testCustomSymptom() {
+            tracker.addSymptomDirectly('custom pain');
+        }
+    </script>
+</body>
+</html>

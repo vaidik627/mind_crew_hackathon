@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Clear All Data - Health Tracker</title>
+    <style>
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            margin: 0;
+            padding: 20px;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .container {
+            background: white;
+            border-radius: 15px;
+            padding: 40px;
+            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            max-width: 600px;
+            width: 100%;
+            text-align: center;
+        }
+        
+        .icon {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            color: #e74c3c;
+        }
+        
+        h1 {
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-size: 2rem;
+        }
+        
+        .warning {
+            background: #fff3cd;
+            border: 1px solid #ffeaa7;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            color: #856404;
+        }
+        
+        .data-list {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px 0;
+            text-align: left;
+        }
+        
+        .data-list h3 {
+            margin-top: 0;
+            color: #495057;
+        }
+        
+        .data-list ul {
+            margin: 10px 0;
+            padding-left: 20px;
+        }
+        
+        .data-list li {
+            margin: 5px 0;
+            color: #6c757d;
+        }
+        
+        .button-group {
+            margin-top: 30px;
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+        
+        button {
+            padding: 12px 24px;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            min-width: 150px;
+        }
+        
+        .clear-btn {
+            background: #e74c3c;
+            color: white;
+        }
+        
+        .clear-btn:hover {
+            background: #c0392b;
+            transform: translateY(-2px);
+        }
+        
+        .cancel-btn {
+            background: #95a5a6;
+            color: white;
+        }
+        
+        .cancel-btn:hover {
+            background: #7f8c8d;
+            transform: translateY(-2px);
+        }
+        
+        .status {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 8px;
+            font-weight: 600;
+            display: none;
+        }
+        
+        .status.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .status.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .progress {
+            margin-top: 20px;
+            display: none;
+        }
+        
+        .progress-bar {
+            width: 100%;
+            height: 8px;
+            background: #e9ecef;
+            border-radius: 4px;
+            overflow: hidden;
+        }
+        
+        .progress-fill {
+            height: 100%;
+            background: #28a745;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="icon">🗑️</div>
+        <h1>Clear All Data</h1>
+        
+        <div class="warning">
+            <strong>⚠️ Warning:</strong> This action will permanently delete all data from the Health Tracker application. This cannot be undone!
+        </div>
+        
+        <div class="data-list">
+            <h3>The following data will be cleared:</h3>
+            <ul>
+                <li>All user accounts and profiles</li>
+                <li>All symptom records and health data</li>
+                <li>User preferences and settings</li>
+                <li>WhatsApp setup information</li>
+                <li>Login sessions and authentication data</li>
+                <li>All browser localStorage data</li>
+                <li>Application cache and temporary data</li>
+            </ul>
+        </div>
+        
+        <div class="button-group">
+            <button class="cancel-btn" onclick="goBack()">Cancel</button>
+            <button class="clear-btn" onclick="clearAllData()">Clear All Data</button>
+        </div>
+        
+        <div class="progress" id="progress">
+            <div class="progress-bar">
+                <div class="progress-fill" id="progressFill"></div>
+            </div>
+            <p id="progressText">Clearing data...</p>
+        </div>
+        
+        <div class="status" id="status"></div>
+    </div>
+
+    <script>
+        function goBack() {
+            window.location.href = 'index.html';
+        }
+        
+        async function clearAllData() {
+            const progressDiv = document.getElementById('progress');
+            const progressFill = document.getElementById('progressFill');
+            const progressText = document.getElementById('progressText');
+            const statusDiv = document.getElementById('status');
+            
+            // Show progress
+            progressDiv.style.display = 'block';
+            statusDiv.style.display = 'none';
+            
+            try {
+                // Step 1: Clear localStorage
+                progressFill.style.width = '20%';
+                progressText.textContent = 'Clearing browser storage...';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                localStorage.clear();
+                
+                // Step 2: Clear sessionStorage
+                progressFill.style.width = '40%';
+                progressText.textContent = 'Clearing session data...';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                sessionStorage.clear();
+                
+                // Step 3: Clear IndexedDB (if any)
+                progressFill.style.width = '60%';
+                progressText.textContent = 'Clearing database cache...';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Clear IndexedDB
+                if ('indexedDB' in window) {
+                    try {
+                        const databases = await indexedDB.databases();
+                        await Promise.all(databases.map(db => {
+                            return new Promise((resolve, reject) => {
+                                const deleteReq = indexedDB.deleteDatabase(db.name);
+                                deleteReq.onsuccess = () => resolve();
+                                deleteReq.onerror = () => resolve(); // Continue even if error
+                            });
+                        }));
+                    } catch (e) {
+                        console.log('IndexedDB clearing skipped:', e);
+                    }
+                }
+                
+                // Step 4: Clear cookies (same origin only)
+                progressFill.style.width = '80%';
+                progressText.textContent = 'Clearing cookies...';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Clear cookies for this domain
+                document.cookie.split(";").forEach(function(c) { 
+                    document.cookie = c.replace(/^ +/, "").replace(/=.*/, "=;expires=" + new Date().toUTCString() + ";path=/"); 
+                });
+                
+                // Step 5: Complete
+                progressFill.style.width = '100%';
+                progressText.textContent = 'Data clearing complete!';
+                await new Promise(resolve => setTimeout(resolve, 500));
+                
+                // Hide progress and show success
+                progressDiv.style.display = 'none';
+                statusDiv.className = 'status success';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `
+                    <strong>✅ Success!</strong><br>
+                    All data has been successfully cleared from the Health Tracker application.<br>
+                    <br>
+                    <button onclick="window.location.href='index.html'" style="margin-top: 10px; padding: 8px 16px; background: #28a745; color: white; border: none; border-radius: 4px; cursor: pointer;">
+                        Return to Application
+                    </button>
+                `;
+                
+            } catch (error) {
+                console.error('Error clearing data:', error);
+                
+                progressDiv.style.display = 'none';
+                statusDiv.className = 'status error';
+                statusDiv.style.display = 'block';
+                statusDiv.innerHTML = `
+                    <strong>❌ Error!</strong><br>
+                    There was an error clearing some data: ${error.message}<br>
+                    Please try again or clear data manually.
+                `;
+            }
+        }
+        
+        // Show current localStorage data count
+        window.addEventListener('load', function() {
+            const localStorageCount = localStorage.length;
+            const sessionStorageCount = sessionStorage.length;
+            
+            if (localStorageCount > 0 || sessionStorageCount > 0) {
+                const dataInfo = document.createElement('div');
+                dataInfo.className = 'data-list';
+                dataInfo.innerHTML = `
+                    <h3>Current Data Found:</h3>
+                    <ul>
+                        <li>localStorage items: ${localStorageCount}</li>
+                        <li>sessionStorage items: ${sessionStorageCount}</li>
+                    </ul>
+                `;
+                document.querySelector('.warning').after(dataInfo);
+            }
+        });
+    </script>
+</body>
+</html>

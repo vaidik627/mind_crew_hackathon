@@ -1,0 +1,54 @@
+{
+  "database": {
+    "type": "json_file",
+    "version": "1.0",
+    "created": "2024-01-01T00:00:00.000Z",
+    "description": "Health Tracker Database Configuration"
+  },
+  "files": {
+    "symptoms": {
+      "path": "./database/symptoms.json",
+      "description": "User symptom records",
+      "autoBackup": true,
+      "maxSize": "10MB"
+    },
+    "users": {
+      "path": "./database/users.json",
+      "description": "User accounts and authentication",
+      "autoBackup": true,
+      "maxSize": "5MB"
+    },
+    "symptom_definitions": {
+      "path": "./database/symptom_definitions.json",
+      "description": "Symptom categories and definitions",
+      "autoBackup": false,
+      "maxSize": "2MB"
+    }
+  },
+  "settings": {
+    "autoSave": true,
+    "saveInterval": 5000,
+    "backupEnabled": true,
+    "backupInterval": 86400000,
+    "maxBackups": 7,
+    "compression": false,
+    "encryption": false
+  },
+  "fallback": {
+    "useLocalStorage": true,
+    "localStoragePrefix": "healthtracker_",
+    "syncWithDatabase": true
+  },
+  "performance": {
+    "cacheEnabled": true,
+    "cacheSize": 100,
+    "indexingEnabled": true,
+    "lazyLoading": true
+  },
+  "security": {
+    "validateSchema": true,
+    "sanitizeInput": true,
+    "rateLimiting": false,
+    "auditLog": false
+  }
+}

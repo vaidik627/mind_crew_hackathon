@@ -1,0 +1,251 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-01-01T00:00:00.000Z",
+    "lastModified": "2024-01-01T00:00:00.000Z",
+    "description": "Health Tracker Symptom Definitions Database"
+  },
+  "categories": [
+    {
+      "id": "pain_discomfort",
+      "name": "Pain & Discomfort",
+      "description": "Physical pain and discomfort symptoms",
+      "color": "#ff6b6b"
+    },
+    {
+      "id": "respiratory",
+      "name": "Respiratory",
+      "description": "Breathing and respiratory system symptoms",
+      "color": "#4ecdc4"
+    },
+    {
+      "id": "general_symptoms",
+      "name": "General Symptoms",
+      "description": "Common general health symptoms",
+      "color": "#45b7d1"
+    },
+    {
+      "id": "mental_health",
+      "name": "Mental Health",
+      "description": "Mental and emotional health symptoms",
+      "color": "#96ceb4"
+    },
+    {
+      "id": "digestive",
+      "name": "Digestive",
+      "description": "Digestive system related symptoms",
+      "color": "#feca57"
+    },
+    {
+      "id": "skin_external",
+      "name": "Skin & External",
+      "description": "Skin and external body symptoms",
+      "color": "#ff9ff3"
+    },
+    {
+      "id": "neurological",
+      "name": "Neurological",
+      "description": "Nervous system and neurological symptoms",
+      "color": "#a8e6cf"
+    }
+  ],
+  "symptoms": [
+    {
+      "id": "headache",
+      "name": "Headache",
+      "category": "pain_discomfort",
+      "icon": "fas fa-head-side-virus",
+      "keywords": ["head", "pain", "migraine", "tension"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["A few minutes", "15-30 minutes", "1-3 hours", "Half a day (4-6 hours)"],
+      "relatedSymptoms": ["nausea", "fatigue", "sensitivity"],
+      "emergencyThreshold": 9
+    },
+    {
+      "id": "back_pain",
+      "name": "Back Pain",
+      "category": "pain_discomfort",
+      "icon": "fas fa-user-injured",
+      "keywords": ["back", "spine", "lower", "upper"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["15-30 minutes", "1-3 hours", "Half a day (4-6 hours)", "Full day"],
+      "relatedSymptoms": ["muscle_tension", "stiffness"],
+      "emergencyThreshold": 8
+    },
+    {
+      "id": "cough",
+      "name": "Cough",
+      "category": "respiratory",
+      "icon": "fas fa-lungs-virus",
+      "keywords": ["cough", "throat", "chest"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 4
+      },
+      "commonDurations": ["A few minutes", "15-30 minutes", "1-3 hours", "Full day"],
+      "relatedSymptoms": ["sore_throat", "congestion"],
+      "emergencyThreshold": 8
+    },
+    {
+      "id": "shortness_of_breath",
+      "name": "Shortness of Breath",
+      "category": "respiratory",
+      "icon": "fas fa-wind",
+      "keywords": ["breath", "breathing", "air", "oxygen"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 6
+      },
+      "commonDurations": ["A few minutes", "15-30 minutes", "1-3 hours"],
+      "relatedSymptoms": ["chest_pain", "anxiety"],
+      "emergencyThreshold": 7
+    },
+    {
+      "id": "fatigue",
+      "name": "Fatigue",
+      "category": "general_symptoms",
+      "icon": "fas fa-battery-quarter",
+      "keywords": ["tired", "exhausted", "energy", "weak"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["1-3 hours", "Half a day (4-6 hours)", "Full day", "2-3 days"],
+      "relatedSymptoms": ["weakness", "drowsiness"],
+      "emergencyThreshold": 9
+    },
+    {
+      "id": "fever",
+      "name": "Fever",
+      "category": "general_symptoms",
+      "icon": "fas fa-thermometer-full",
+      "keywords": ["temperature", "hot", "chills"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 6
+      },
+      "commonDurations": ["1-3 hours", "Half a day (4-6 hours)", "Full day", "2-3 days"],
+      "relatedSymptoms": ["chills", "sweating"],
+      "emergencyThreshold": 8
+    },
+    {
+      "id": "anxiety",
+      "name": "Anxiety",
+      "category": "mental_health",
+      "icon": "fas fa-brain",
+      "keywords": ["worry", "stress", "nervous", "panic"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["A few minutes", "15-30 minutes", "1-3 hours", "Half a day (4-6 hours)"],
+      "relatedSymptoms": ["restlessness", "rapid_heartbeat"],
+      "emergencyThreshold": 9
+    },
+    {
+      "id": "depression",
+      "name": "Depression",
+      "category": "mental_health",
+      "icon": "fas fa-sad-tear",
+      "keywords": ["sad", "down", "mood", "hopeless"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["Half a day (4-6 hours)", "Full day", "2-3 days", "About a week"],
+      "relatedSymptoms": ["fatigue", "loss_of_appetite"],
+      "emergencyThreshold": 9
+    },
+    {
+      "id": "nausea",
+      "name": "Nausea",
+      "category": "digestive",
+      "icon": "fas fa-dizzy",
+      "keywords": ["sick", "stomach", "queasy"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["A few minutes", "15-30 minutes", "1-3 hours"],
+      "relatedSymptoms": ["vomiting", "dizziness"],
+      "emergencyThreshold": 8
+    },
+    {
+      "id": "stomach_pain",
+      "name": "Stomach Pain",
+      "category": "digestive",
+      "icon": "fas fa-stomach",
+      "keywords": ["stomach", "abdomen", "belly"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 5
+      },
+      "commonDurations": ["15-30 minutes", "1-3 hours", "Half a day (4-6 hours)"],
+      "relatedSymptoms": ["nausea", "bloating"],
+      "emergencyThreshold": 8
+    },
+    {
+      "id": "rash",
+      "name": "Rash",
+      "category": "skin_external",
+      "icon": "fas fa-allergies",
+      "keywords": ["skin", "red", "irritation"],
+      "severity": {
+        "min": 1,
+        "max": 10,
+        "default": 4
+      },
+      "commonDurations": ["1-3 hours", "Half a day (4-6 hours)", "Full day", "2-3 days"],
+      "relatedSymptoms": ["itching", "swelling"],
+      "emergencyThreshold": 7
+    },
+    {
+      "id": "migraine",
+      "name": "Migraine",
+      "category": "neurological",
+      "icon": "fas fa-head-side-virus",
+      "keywords": ["migraine", "severe", "headache"],
+      "severity": {
+        "min": 3,
+        "max": 10,
+        "default": 7
+      },
+      "commonDurations": ["1-3 hours", "Half a day (4-6 hours)", "Full day"],
+      "relatedSymptoms": ["nausea", "light_sensitivity"],
+      "emergencyThreshold": 9
+    }
+  ],
+  "smartSuggestions": {
+    "combinations": {
+      "headache": ["nausea", "fatigue", "light sensitivity"],
+      "fever": ["chills", "fatigue", "body aches"],
+      "cough": ["sore throat", "congestion", "fatigue"],
+      "nausea": ["vomiting", "dizziness", "stomach pain"],
+      "anxiety": ["rapid heartbeat", "sweating", "restlessness"],
+      "back_pain": ["muscle tension", "stiffness", "limited mobility"],
+      "migraine": ["nausea", "light sensitivity", "sound sensitivity"]
+    },
+    "partialMatches": {
+      "head": ["headache", "migraine", "dizziness"],
+      "stomach": ["stomach pain", "nausea", "bloating"],
+      "chest": ["chest pain", "shortness of breath", "cough"],
+      "throat": ["sore throat", "cough", "difficulty swallowing"]
+    }
+  }
+}

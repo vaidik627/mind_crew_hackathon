@@ -1,0 +1,46 @@
+{
+  "metadata": {
+    "version": "1.0",
+    "created": "2024-01-01T00:00:00.000Z",
+    "lastModified": "2024-01-01T00:00:00.000Z",
+    "totalUsers": 0,
+    "description": "Health Tracker Users Database"
+  },
+  "users": [],
+  "sessions": [],
+  "schema": {
+    "user": {
+      "id": "string - unique user identifier",
+      "username": "string - username",
+      "email": "string - email address",
+      "passwordHash": "string - hashed password",
+      "profile": {
+        "firstName": "string",
+        "lastName": "string",
+        "dateOfBirth": "string",
+        "gender": "string",
+        "emergencyContact": "string"
+      },
+      "preferences": {
+        "theme": "string",
+        "notifications": "boolean",
+        "dataRetention": "number"
+      },
+      "createdAt": "string - ISO date string",
+      "lastLogin": "string - ISO date string",
+      "isActive": "boolean"
+    },
+    "session": {
+      "sessionId": "string - unique session identifier",
+      "userId": "string - user identifier",
+      "createdAt": "string - ISO date string",
+      "expiresAt": "string - ISO date string",
+      "isActive": "boolean"
+    }
+  },
+  "indexes": {
+    "byUsername": {},
+    "byEmail": {},
+    "bySession": {}
+  }
+}
